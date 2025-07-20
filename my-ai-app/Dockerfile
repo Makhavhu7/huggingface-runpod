@@ -8,8 +8,9 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+# Install bark from GitHub if not on PyPI
+RUN pip install --no-cache-dir git+https://github.com/suno-ai/bark.git
 
 COPY . .
 
 CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
-

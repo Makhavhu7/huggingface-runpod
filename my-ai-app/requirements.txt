@@ -6,4 +6,3 @@ diffusers
 accelerate
 pydub
 torchaudio
-bark
