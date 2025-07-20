@@ -1,8 +1,3 @@
+# Empty or minimal (e.g., just fastapi, uvicorn if needed)
 fastapi
 uvicorn
-torch
-transformers
-diffusers
-accelerate
-pydub
-torchaudio
