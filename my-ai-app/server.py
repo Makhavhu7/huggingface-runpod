@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import image
 import video
 import audio
+import image2
 
 app = FastAPI()
 
@@ -33,6 +34,14 @@ async def generate_audio_endpoint(request: Prompt):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Audio generation failed: {str(e)}")
 
+@app.post("/generate/image2")
+async def generate_image2_endpoint(request: Prompt):
+    try:
+        result = image2.generate_image(request.prompt)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image2 generation failed: {str(e)}")
+
 @app.get("/health/image")
 async def image_health():
     return image.health_check()
@@ -44,3 +53,7 @@ async def video_health():
 @app.get("/health/audio")
 async def audio_health():
     return audio.health_check()
+
+@app.get("/health/image2")
+async def image2_health():
+    return image2.health_check()
