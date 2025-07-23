@@ -9,12 +9,13 @@ RUN apt-get update && apt-get install -y \
     libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy application files from the models directory
-COPY models/requirements.txt .
-COPY models/image.py .
-COPY models/video.py .
-COPY models/audio.py .
-COPY models/server.py .
+# Copy application files
+COPY requirements.txt .
+COPY image.py .
+COPY video.py .
+COPY audio.py .
+COPY image2.py .
+COPY server.py .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
