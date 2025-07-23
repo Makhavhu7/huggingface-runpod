@@ -1,7 +1,7 @@
 import torch
-  from transformers import pipeline
+from transformers import pipeline
 
-  def load_audio_model():
+def load_audio_model():
       try:
           pipe = pipeline(
               "text-to-speech",
@@ -12,16 +12,16 @@ import torch
       except Exception as e:
           raise Exception(f"Failed to load audio model: {str(e)}")
 
-  pipe = load_audio_model()
+pipe = load_audio_model()
 
-  def generate_audio(prompt: str):
+def generate_audio(prompt: str):
       try:
           audio = pipe(prompt)
           return {"audio": audio}  # Simplified; actual encoding depends on output format
       except Exception as e:
           return {"error": f"Audio generation failed: {str(e)}"}
 
-  def health_check():
+def health_check():
       try:
           _ = pipe("test")
           return {"status": "healthy"}
