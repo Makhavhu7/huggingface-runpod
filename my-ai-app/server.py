@@ -1,44 +1,46 @@
 from fastapi import FastAPI, HTTPException
-from Image import ImageGenerator
-from Video import VideoGenerator
-from Audio import AudioGenerator
-import os
+from pydantic import BaseModel
+import image
+import video
+import audio
 
 app = FastAPI()
 
-# Initialize generators
-image_gen = ImageGenerator()
-video_gen = VideoGenerator()
-audio_gen = AudioGenerator()
-
-@app.get("/health")
-async def health_check():
-    return {
-        "image_model": image_gen.health_check(),
-        "video_model": video_gen.health_check(),
-        "audio_model": audio_gen.health_check()
-    }
+class Prompt(BaseModel):
+    prompt: str
 
 @app.post("/generate/image")
-async def generate_image(prompt: str):
+async def generate_image_endpoint(request: Prompt):
     try:
-        output_path = image_gen.generate(prompt)
-        return {"output": output_path}
+        result = image.generate_image(request.prompt)
+        return result
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Image generation failed: {str(e)}")
 
 @app.post("/generate/video")
-async def generate_video(prompt: str):
+async def generate_video_endpoint(request: Prompt):
     try:
-        output_path = video_gen.generate(prompt)
-        return {"output": output_path}
+        result = video.generate_video(request.prompt)
+        return result
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Video generation failed: {str(e)}")
 
 @app.post("/generate/audio")
-async def generate_audio(prompt: str):
+async def generate_audio_endpoint(request: Prompt):
     try:
-        output_path = audio_gen.generate(prompt)
-        return {"output": output_path}
+        result = audio.generate_audio(request.prompt)
+        return result
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Audio generation failed: {str(e)}")
+
+@app.get("/health/image")
+async def image_health():
+    return image.health_check()
+
+@app.get("/health/video")
+async def video_health():
+    return video.health_check()
+
+@app.get("/health/audio")
+async def audio_health():
+    return audio.health_check()

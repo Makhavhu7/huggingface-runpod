@@ -1,22 +1,29 @@
-from transformers import AutoProcessor, BarkModel
-import scipy.io.wavfile
 import torch
-import os
+from transformers import pipeline
 
-class AudioGenerator:
-    def __init__(self):
-        model_id = "suno/bark"
-        self.processor = AutoProcessor.from_pretrained(model_id)
-        self.model = BarkModel.from_pretrained(model_id)
-        self.model = self.model.to("cuda" if torch.cuda.is_available() else "cpu")
+def load_audio_model():
+    try:
+        pipe = pipeline(
+            "text-to-speech",
+            model="suno/bark",
+            device="cuda" if torch.cuda.is_available() else "cpu"
+        )
+        return pipe
+    except Exception as e:
+        raise Exception(f"Failed to load audio model: {str(e)}")
 
-    def generate(self, prompt, output_path="output_audio.wav"):
-        inputs = self.processor(prompt, return_tensors="pt")
-        inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
-        audio_array = self.model.generate(**inputs)
-        audio_array = audio_array.cpu().numpy().squeeze()
-        scipy.io.wavfile.write(output_path, rate=24000, data=audio_array)
-        return output_path
+pipe = load_audio_model()
 
-    def health_check(self):
-        return self.model is not None
+def generate_audio(prompt: str):
+    try:
+        audio = pipe(prompt)
+        return {"audio": audio}  # Simplified; actual encoding depends on output format
+    except Exception as e:
+        return {"error": f"Audio generation failed: {str(e)}"}
+
+def health_check():
+    try:
+        _ = pipe("test")
+        return {"status": "healthy"}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}

@@ -1,33 +1,30 @@
-FROM nvidia/cuda:12.2.0-devel-ubuntu22.04
+FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install Python and pip
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    python3.10 \
-    python3-pip \
+    git \
+    build-essential \
+    libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-RUN pip3 install --no-cache-dir \
-    torch==2.1.0 \
-    transformers==4.36.2 \
-    diffusers==0.21.4 \
-    fastapi==0.103.0 \
-    uvicorn==0.23.2 \
-    scipy==1.11.3
-
 # Copy application files
-COPY Image.py .
-COPY Video.py .
-COPY Audio.py .
+COPY requirements.txt .
+COPY image.py .
+COPY video.py .
+COPY audio.py .
 COPY server.py .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Set environment variables for Hugging Face
+ENV HF_HOME=/app/.cache/huggingface
+ENV HF_TOKEN=$HF_TOKEN
 
 # Expose port for FastAPI
 EXPOSE 8000
 
-# Set environment variable for Hugging Face token (optional, set at runtime)
-ENV HF_TOKEN=""
-
-# Run the FastAPI server
-CMD ["uvicorn", "server.py:app", "--host", "0.0.0.0", "--port", "8000"]
+# Command to run the server
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
