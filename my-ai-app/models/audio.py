@@ -1,12 +1,22 @@
-from bark import generate_audio, preload_models
-import base64
-import torchaudio
+from transformers import AutoProcessor, BarkModel
+import scipy.io.wavfile
+import torch
+import os
 
-preload_models()
+class AudioGenerator:
+    def __init__(self):
+        model_id = "suno/bark"
+        self.processor = AutoProcessor.from_pretrained(model_id)
+        self.model = BarkModel.from_pretrained(model_id)
+        self.model = self.model.to("cuda" if torch.cuda.is_available() else "cpu")
 
-def generate_audio(prompt: str):
-    waveform = generate_audio(prompt, history_prompt=None)
-    torchaudio.save("audio.wav", waveform, sample_rate=24000)
-    with open("audio.wav", "rb") as f:
-        audio_b64 = base64.b64encode(f.read()).decode("utf-8")
-    return {"audio_base64": audio_b64}
+    def generate(self, prompt, output_path="output_audio.wav"):
+        inputs = self.processor(prompt, return_tensors="pt")
+        inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
+        audio_array = self.model.generate(**inputs)
+        audio_array = audio_array.cpu().numpy().squeeze()
+        scipy.io.wavfile.write(output_path, rate=24000, data=audio_array)
+        return output_path
+
+    def health_check(self):
+        return self.model is not None

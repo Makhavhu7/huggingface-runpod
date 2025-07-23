@@ -1,19 +1,23 @@
-from diffusers import DiffusionPipeline
+from transformers import pipeline
 import torch
-import base64
-import imageio
+import os
 
-pipe = DiffusionPipeline.from_pretrained(
-    "Wan-AI/Wan2.1-T2V-14B",
-    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
-).to("cuda" if torch.cuda.is_available() else "cpu")
+class VideoGenerator:
+    def __init__(self):
+        model_id = "Wan-AI/Wan2.1-T2V-14B"
+        try:
+            self.pipe = pipeline("text-to-video", model=model_id, device=0 if torch.cuda.is_available() else -1)
+        except Exception as e:
+            print(f"Error loading video model: {e}")
+            self.pipe = None
 
-def generate_video(prompt: str):
-    video_frames = pipe(prompt, num_frames=16).frames
-    writer = imageio.get_writer("video.mp4", fps=8)
-    for frame in video_frames:
-        writer.append_data(frame)
-    writer.close()
-    with open("video.mp4", "rb") as f:
-        video_b64 = base64.b64encode(f.read()).decode("utf-8")
-    return {"video_base64": video_b64}
+    def generate(self, prompt, output_path="output_video.mp4"):
+        if self.pipe is None:
+            raise Exception("Video model not loaded")
+        video = self.pipe(prompt)
+        with open(output_path, "wb") as f:
+            f.write(video["video"])
+        return output_path
+
+    def health_check(self):
+        return self.pipe is not None

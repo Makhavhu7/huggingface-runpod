@@ -1,23 +1,33 @@
-FROM python:3.10-slim
+FROM nvidia/cuda:12.2.0-devel-ubuntu22.04
 
 WORKDIR /app
 
-# Install minimal system dependencies
+# Install Python and pip
 RUN apt-get update && apt-get install -y \
-    ffmpeg libsndfile1 git curl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    python3.10 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy and install only required Python packages
-COPY requirements.txt .
-RUN pip install --no-cache-dir \
-    fastapi \
-    uvicorn \
-    pydub \
-    && pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu \
-    && pip install --no-cache-dir transformers diffusers accelerate \
-    && pip install --no-cache-dir git+https://github.com/suno-ai/bark.git
+# Install dependencies
+RUN pip3 install --no-cache-dir \
+    torch==2.1.0 \
+    transformers==4.36.2 \
+    diffusers==0.21.4 \
+    fastapi==0.103.0 \
+    uvicorn==0.23.2 \
+    scipy==1.11.3
 
-# Copy the rest of the application
-COPY . .
+# Copy application files
+COPY Image.py .
+COPY Video.py .
+COPY Audio.py .
+COPY server.py .
 
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+# Expose port for FastAPI
+EXPOSE 8000
+
+# Set environment variable for Hugging Face token (optional, set at runtime)
+ENV HF_TOKEN=""
+
+# Run the FastAPI server
+CMD ["uvicorn", "server.py:app", "--host", "0.0.0.0", "--port", "8000"]
