@@ -19,10 +19,6 @@ COPY server.py .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Set environment variables for Hugging Face
-ENV HF_HOME=/app/.cache/huggingface
-ENV HF_TOKEN=$HF_TOKEN
-
 # Expose port for FastAPI
 EXPOSE 8000
 
