@@ -18,7 +18,7 @@ WORKDIR /app
 
 COPY --from=builder /app .
 
-ENV HUGGINGFACE_TOKEN=""
+ENV HUGGINGFACE_TOKEN="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"
 EXPOSE 8000
 
 CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
