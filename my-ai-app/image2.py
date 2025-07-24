@@ -2,14 +2,16 @@ import torch
 from diffusers import StableDiffusionPipeline
 import base64
 from io import BytesIO
+import os
 
 def load_image_model():
     try:
         pipe = StableDiffusionPipeline.from_pretrained(
             "black-forest-labs/FLUX.1-dev",
             torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-            use_auth_token=True
+            token=os.getenv("HUGGINGFACE_TOKEN")
         ).to("cuda" if torch.cuda.is_available() else "cpu")
+        pipe.enable_attention_slicing()  # Optimize memory usage
         return pipe
     except Exception as e:
         raise Exception(f"Failed to load image model: {str(e)}")
@@ -18,7 +20,7 @@ pipe = load_image_model()
 
 def generate_image(prompt: str):
     try:
-        image = pipe(prompt).images[0]
+        image = pipe(prompt, num_inference_steps=50).images[0]
         buffer = BytesIO()
         image.save(buffer, format="PNG")
         img_b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
