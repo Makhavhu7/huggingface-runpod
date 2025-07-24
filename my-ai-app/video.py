@@ -20,8 +20,7 @@ pipe = load_video_model()
 
 def generate_video(prompt: str):
     try:
-        video_data = pipe(prompt, num_frames=8)  # Reduced frames for speed
-        # Simplified output; adjust based on actual frame format
+        video_data = pipe(prompt, num_frames=8)
         buffer = io.BytesIO()
         for frame in video_data["frames"]:
             buffer.write(frame.tobytes())

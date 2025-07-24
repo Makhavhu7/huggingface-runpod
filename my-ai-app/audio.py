@@ -22,7 +22,6 @@ def generate_audio(prompt: str):
     try:
         audio = pipe(prompt)
         buffer = io.BytesIO()
-        # Simplified output; adjust based on actual audio format
         buffer.write(audio["audio"].tobytes())
         audio_b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
         return {"audio_base64": audio_b64, "sampling_rate": audio["sampling_rate"]}

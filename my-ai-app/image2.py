@@ -20,7 +20,7 @@ pipe = load_image_model()
 
 def generate_image(prompt: str):
     try:
-        image = pipe(prompt, num_inference_steps=25).images[0]  # Reduced steps for speed
+        image = pipe(prompt, num_inference_steps=25).images[0]
         buffer = BytesIO()
         image.save(buffer, format="PNG")
         img_b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
