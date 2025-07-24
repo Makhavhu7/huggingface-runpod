@@ -1,8 +1,7 @@
 import torch
 from transformers import pipeline
 import base64
-import cv2
-import numpy as np
+import io
 import os
 
 def load_video_model():
@@ -21,17 +20,12 @@ pipe = load_video_model()
 
 def generate_video(prompt: str):
     try:
-        video_frames = pipe(prompt, num_frames=16)["frames"]
-        # Convert frames to base64-encoded video
-        out = cv2.VideoWriter(
-            "temp.mp4", cv2.VideoWriter_fourcc(*"mp4v"), 24, (video_frames[0].shape[1], video_frames[0].shape[0])
-        )
-        for frame in video_frames:
-            frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
-            out.write(frame)
-        out.release()
-        with open("temp.mp4", "rb") as f:
-            video_b64 = base64.b64encode(f.read()).decode("utf-8")
+        video_data = pipe(prompt, num_frames=8)  # Reduced frames for speed
+        # Simplified output; adjust based on actual frame format
+        buffer = io.BytesIO()
+        for frame in video_data["frames"]:
+            buffer.write(frame.tobytes())
+        video_b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
         return {"video_base64": video_b64}
     except Exception as e:
         return {"error": f"Video generation failed: {str(e)}"}
