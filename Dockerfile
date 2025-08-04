@@ -4,7 +4,7 @@ FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
 # Set working directory
 WORKDIR /app
 
-# Copy requirements file and install dependencies
+# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ ./app/
 COPY main.py .
 
-# Set environment variables for better performance
+# Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
 
