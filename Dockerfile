@@ -3,11 +3,13 @@ FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime AS builder
 
 WORKDIR /app
 
-# Install only what’s needed, no extras
-COPY requirements.txt .
-RUN pip install --no-cache-dir --prefer-binary --no-deps -r requirements.txt
+# Install dependencies inline, no external file
+RUN pip install --no-cache-dir --prefer-binary --no-deps \
+    torch>=2.0.0 \
+    diffusers>=0.20.0 \
+    transformers>=4.30.0
 
-# Copy just the code
+# Copy only the application code
 COPY app/queue_manager.py app/
 COPY app/models/load_image_models.py app/models/
 COPY app/models/load_audio_models.py app/models/
@@ -22,9 +24,10 @@ FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
 
 WORKDIR /app
 
+# Copy only runtime essentials
 COPY --from=builder /app /app
 
-# Use RAM for caches, skip disk
+# Environment to minimize disk use
 ENV PYTHONUNBUFFERED=1
 ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
 ENV HUGGINGFACE_HUB_CACHE=/dev/shm/hf_cache
