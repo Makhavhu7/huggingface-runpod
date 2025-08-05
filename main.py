@@ -15,7 +15,7 @@ async def start_all_workers():
 
 async def process_image_task(prompt, model, queue):
     queue.put_nowait({"prompt": prompt, "model": model})
-    await asyncio.sleep(10)  # Placeholder
+    await asyncio.sleep(10)
     output_file = "output_sdxl.png" if model == "sdxl" else "output_flux.png"
     with open(output_file, "rb") as f:
         img_data = base64.b64encode(f.read()).decode("utf-8")
@@ -48,4 +48,3 @@ def handler(event):
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_all_workers())

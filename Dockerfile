@@ -1,13 +1,13 @@
-# Stage 1: Build environment
+# Build stage
 FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime AS builder
 
 WORKDIR /app
 
-# Install dependencies without caching, force binaries
+# Install only what’s needed, no extras
 COPY requirements.txt .
 RUN pip install --no-cache-dir --prefer-binary --no-deps -r requirements.txt
 
-# Copy only essential code
+# Copy just the code
 COPY app/queue_manager.py app/
 COPY app/models/load_image_models.py app/models/
 COPY app/models/load_audio_models.py app/models/
@@ -17,20 +17,17 @@ COPY app/workers/image_worker.py app/workers/
 COPY app/workers/video_worker.py app/workers/
 COPY main.py .
 
-# Stage 2: Runtime environment
+# Runtime stage
 FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
 
 WORKDIR /app
 
-# Copy built dependencies and code
 COPY --from=builder /app /app
 
-# Environment settings to minimize disk use
+# Use RAM for caches, skip disk
 ENV PYTHONUNBUFFERED=1
 ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
-ENV HUGGINGFACE_HUB_CACHE=/dev/shm/hf_cache  
-# RAM-based cache
+ENV HUGGINGFACE_HUB_CACHE=/dev/shm/hf_cache
 ENV TRANSFORMERS_CACHE=/dev/shm/transformers_cache
 
-# Run command
 CMD ["python", "-u", "main.py"]
