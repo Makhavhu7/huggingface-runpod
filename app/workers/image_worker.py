@@ -1,5 +1,3 @@
-# backend/app/workers/image_worker.py
-
 import asyncio
 from app.queue_manager import image_queue
 from app.models.load_image_models import generate_with_flux, generate_with_sdxl
