@@ -3,9 +3,9 @@ FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime AS builder
 
 WORKDIR /app
 
-# Install minimal dependencies without caching
+# Install dependencies without caching, force binaries
 COPY requirements.txt .
-RUN pip install --no-cache-dir --prefer-binary -r requirements.txt
+RUN pip install --no-cache-dir --prefer-binary --no-deps -r requirements.txt
 
 # Copy only essential code
 COPY app/queue_manager.py app/
@@ -25,11 +25,11 @@ WORKDIR /app
 # Copy built dependencies and code
 COPY --from=builder /app /app
 
-# Environment settings to minimize storage
+# Environment settings to minimize disk use
 ENV PYTHONUNBUFFERED=1
 ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
-ENV HUGGINGFACE_HUB_CACHE=/dev/shm/hf_cache 
-# Use RAM-based tmpfs to avoid disk
+ENV HUGGINGFACE_HUB_CACHE=/dev/shm/hf_cache  
+# RAM-based cache
 ENV TRANSFORMERS_CACHE=/dev/shm/transformers_cache
 
 # Run command
