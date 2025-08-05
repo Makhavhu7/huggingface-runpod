@@ -15,8 +15,7 @@ async def start_all_workers():
 
 async def process_image_task(prompt, model, queue):
     queue.put_nowait({"prompt": prompt, "model": model})
-    # Simulate wait (in production, use a callback or queue result)
-    await asyncio.sleep(10)  # Adjust based on generation time
+    await asyncio.sleep(10)  # Placeholder; replace with callback
     output_file = "output_sdxl.png" if model == "sdxl" else "output_flux.png"
     with open(output_file, "rb") as f:
         img_data = base64.b64encode(f.read()).decode("utf-8")

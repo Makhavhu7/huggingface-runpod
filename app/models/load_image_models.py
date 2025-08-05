@@ -3,7 +3,7 @@ import torch
 
 device = "cuda"
 
-# Load models once and keep warm with FP16 for VRAM savings
+# Load models with FP16 for VRAM efficiency
 sdxl_pipe = StableDiffusionXLPipeline.from_pretrained(
     "stabilityai/stable-diffusion-xl-base-1.0", torch_dtype=torch.float16
 ).to(device)

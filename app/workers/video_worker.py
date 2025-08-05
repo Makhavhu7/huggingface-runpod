@@ -11,5 +11,5 @@ async def video_worker():
         video_queue.task_done()
 
 async def start_video_workers():
-    for _ in range(1):  # Most video models are VRAM heavy
+    for _ in range(1):
         asyncio.create_task(video_worker())
