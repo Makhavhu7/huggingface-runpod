@@ -13,6 +13,15 @@ async def start_all_workers():
         start_video_workers()
     )
 
+async def process_image_task(prompt, model, queue):
+    queue.put_nowait({"prompt": prompt, "model": model})
+    # Simulate wait (in production, use a callback or queue result)
+    await asyncio.sleep(10)  # Adjust based on generation time
+    output_file = "output_sdxl.png" if model == "sdxl" else "output_flux.png"
+    with open(output_file, "rb") as f:
+        img_data = base64.b64encode(f.read()).decode("utf-8")
+    return {"status": "Image generated", "prompt": prompt, "model": model, "image": img_data}
+
 def handler(event):
     try:
         input_data = event.get("input", {})
@@ -22,14 +31,10 @@ def handler(event):
         if not prompt:
             return {"error": "Prompt is required"}
 
+        loop = asyncio.get_event_loop()
         if model in ["sdxl", "flux"]:
-            image_queue.put_nowait({"prompt": prompt, "model": model})
-            import time
-            time.sleep(10)  # Wait for generation (adjust based on actual time)
-            output_file = "output_sdxl.png" if model == "sdxl" else "output_flux.png"
-            with open(output_file, "rb") as f:
-                img_data = base64.b64encode(f.read()).decode("utf-8")
-            return {"status": "Image generated", "prompt": prompt, "model": model, "image": img_data}
+            result = loop.run_until_complete(process_image_task(prompt, model, image_queue))
+            return result
         elif model == "suno":
             audio_queue.put_nowait({"prompt": prompt, "model": model})
             return {"status": "Audio generation queued", "prompt": prompt, "model": model}
