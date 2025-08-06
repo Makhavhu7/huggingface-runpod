@@ -7,8 +7,8 @@ TAG="latest"
 # Debug: Print the combined tag
 echo "Building image: $IMAGE_NAME:$TAG"
 
-# Build the image
-docker build -t "$IMAGE_NAME:$TAG" .
+# Build the image with no cache
+docker build --no-cache -t "$IMAGE_NAME:$TAG" .
 
 # Check if build succeeded
 if [ $? -eq 0 ]; then
@@ -24,5 +24,5 @@ if [ $? -eq 0 ]; then
         echo "Push failed, skipping cleanup."
     fi
 else
-    echo "Build failed."
+    echo "Build failed. Please check the Dockerfile, network connection, and build logs."
 fi
