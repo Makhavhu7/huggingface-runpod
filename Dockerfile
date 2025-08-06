@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir --prefer-binary \
     torch==2.0.0 \
     diffusers==0.20.0 \
     transformers==4.30.0 \
-    && rm -rf /root/.cache/pip
+    && rm -rf /root/.cache/pip /tmp/* ~/.cache
 
 # Runtime stage
 FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
