@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define image details
-IMAGE_NAME="makhavhu/huggingface-runpod"
+IMAGE_NAME="makhavhu/my-ai-app"
 TAG="latest"
 
 # Debug: Print the combined tag
