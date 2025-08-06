@@ -7,12 +7,10 @@ async def audio_worker():
         task = await audio_queue.get()
         prompt = task.get("prompt", "")
         model = task.get("model", "suno")
-
         generate_audio(prompt, model)
         print(f"[AUDIO DONE] {model} -> {prompt}")
-
         audio_queue.task_done()
 
 async def start_audio_workers():
-    for _ in range(2):  # Adjust based on GPU load
+    for _ in range(2):
         asyncio.create_task(audio_worker())
