@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define image details
-IMAGE_NAME="makhavhu/my-ai-app"  # Updated to match your new repository name
+IMAGE_NAME="makhavhu/my-ai-app"
 TAG="latest"
 
 # Debug: Print the combined tag

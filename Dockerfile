@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir --prefer-binary \
     && rm -rf /root/.cache /tmp/*
 
 # Runtime stage
-FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime-slim
+FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
 
 WORKDIR /app
 COPY --from=builder /app /app
