@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Define image details
-IMAGE_NAME="makhavhu/my-ai-app"
+IMAGE_NAME="makhavhu/my-ai-app"  # Updated to match your new repository name
 TAG="latest"
 
 # Debug: Print the combined tag
 echo "Building image: $IMAGE_NAME:$TAG"
 
-# Build the image (remove --load for now and test basic build)
+# Build the image
 docker build -t "$IMAGE_NAME:$TAG" .
 
 # Check if build succeeded
