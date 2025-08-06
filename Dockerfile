@@ -5,11 +5,12 @@ WORKDIR /app
 COPY app/ app/
 COPY main.py .
 
-# Install minimal dependencies and clean up
-RUN pip install --no-cache-dir --prefer-binary \
+# Install minimal dependencies and verify installation
+RUN pip install --no-cache-dir \
     torch==2.0.0 \
     diffusers==0.20.0 \
     transformers==4.30.0 \
+    && python -c "import diffusers; print('diffusers installed successfully')" \
     && find / -name "__pycache__" -exec rm -rf {} + \
     && rm -rf /root/.cache /tmp/*
 
