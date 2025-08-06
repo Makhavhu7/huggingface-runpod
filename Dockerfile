@@ -5,16 +5,16 @@ WORKDIR /app
 COPY app/ app/
 COPY main.py .
 
-# Install minimal dependencies and clean up aggressively
-RUN pip install --no-cache-dir --prefer-binary --no-deps \
+# Install minimal dependencies and clean up
+RUN pip install --no-cache-dir --prefer-binary \
     torch==2.0.0 \
     diffusers==0.20.0 \
     transformers==4.30.0 \
-    && find / -name "*.pyc" -delete \
-    && rm -rf /root/.cache /tmp/* ~/.cache /var/cache/apk/*
+    && find / -name "__pycache__" -exec rm -rf {} + \
+    && rm -rf /root/.cache /tmp/*
 
 # Runtime stage
-FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
+FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime-slim
 
 WORKDIR /app
 COPY --from=builder /app /app
