@@ -1,5 +1,5 @@
 #!/bin/bash
-IMAGE_NAME="makhavhu/huggingface-runpod:latest"
+IMAGE_NAME="makhavhu/huggingface-runpod"
 TAG="latest"
 
 # Build with platform specification (adjust if needed)
