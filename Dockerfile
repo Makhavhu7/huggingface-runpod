@@ -5,7 +5,7 @@ COPY requirements.txt .
 COPY app/ app/
 COPY main.py .
 
-# Install system dependencies for diffusers
+# Install system dependencies
 RUN apt-get update -qq \
     && apt-get install -y --no-install-recommends \
        build-essential python3-dev libpng-dev libjpeg-dev libopenexr-dev \
@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
 
 # Clean up system packages
 RUN apt-get purge -y build-essential python3-dev cmake \
-    && apt-get autoremove -y -qq \
+    && apt-get autoremove -y \
     && rm -rf /root/.cache /tmp/*
 
 ENV PYTHONUNBUFFERED=1 \
