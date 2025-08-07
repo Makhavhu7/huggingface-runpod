@@ -5,14 +5,22 @@ COPY requirements.txt .
 COPY app/ app/
 COPY main.py .
 
-# Minimize layers and clean up aggressively
+# Install system dependencies for diffusers
 RUN apt-get update -qq \
-    && apt-get install -y --no-install-recommends build-essential python3-dev \
-    && pip install --no-cache-dir -r requirements.txt \
-    && python -c "import diffusers; print('diffusers installed successfully')" \
-    && apt-get purge -y build-essential python3-dev \
+    && apt-get install -y --no-install-recommends \
+       build-essential python3-dev libpng-dev libjpeg-dev libopenexr-dev \
+       libtiff-dev libwebp-dev cmake libgcc1 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt \
+    && python -c "import diffusers; print('diffusers installed successfully')"
+
+# Clean up system packages
+RUN apt-get purge -y build-essential python3-dev cmake \
     && apt-get autoremove -y -qq \
-    && rm -rf /var/lib/apt/lists/* /root/.cache /tmp/*
+    && rm -rf /root/.cache /tmp/*
 
 ENV PYTHONUNBUFFERED=1 \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
