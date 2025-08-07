@@ -5,13 +5,13 @@ COPY requirements.txt .
 COPY app/ app/
 COPY main.py .
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    python3-dev \
+# Minimize layers and clean up aggressively
+RUN apt-get update -qq \
+    && apt-get install -y --no-install-recommends build-essential python3-dev \
     && pip install --no-cache-dir -r requirements.txt \
     && python -c "import diffusers; print('diffusers installed successfully')" \
     && apt-get purge -y build-essential python3-dev \
-    && apt-get autoremove -y \
+    && apt-get autoremove -y -qq \
     && rm -rf /var/lib/apt/lists/* /root/.cache /tmp/*
 
 ENV PYTHONUNBUFFERED=1 \
