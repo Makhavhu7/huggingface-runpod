@@ -4,8 +4,15 @@
 IMAGE_NAME="makhavhu/my-ai-app"
 TAG="latest"
 
+# Check available space
+AVAILABLE_SPACE=$(df -h / | awk 'NR==2 {print $4}' | sed 's/G//')
+if [ "$AVAILABLE_SPACE" -lt 10 ]; then
+    echo "Error: Less than 10GB of free space available. Please free up space."
+    exit 1
+fi
+
 # Ensure Docker Buildx is set up
-docker buildx create --use || true  # Create or use existing builder
+docker buildx create --use || true
 
 # Debug: Print the combined tag
 echo "Building and pushing image: $IMAGE_NAME:$TAG"
