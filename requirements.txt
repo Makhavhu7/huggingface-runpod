@@ -1,3 +1,3 @@
 torch==2.0.0
-diffusers==0.26.0  # Updated to a stable version that installs correctly
+diffusers==0.26.0
 transformers==4.30.0
