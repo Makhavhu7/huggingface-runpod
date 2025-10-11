@@ -18,13 +18,32 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: makhavhu
-          password: dckr_pat_gc-w5FsTrJxGH2BDil0jAvQju64
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Image Docker
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: Dockerfile.image
           platforms: linux/amd64
           push: true
-          tags: makhavhu/my-ai-app:latest
+          tags: makhavhu/my-ai-app-image:latest
+
+      - name: Build and push Video Docker
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.video
+          platforms: linux/amd64
+          push: true
+          tags: makhavhu/my-ai-app-video:latest
+
+      - name: Build and push Audio Docker
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.audio
+          platforms: linux/amd64
+          push: true
+          tags: makhavhu/my-ai-app-audio:latest

@@ -1,0 +1,10 @@
+# [Same as Dockerfile.image until WORKDIR /app]
+
+COPY requirements.audio.txt .
+COPY app/ app/
+COPY main.audio.py main.py
+
+RUN apt-get update && apt-get install -y git libsndfile1 ffmpeg && \
+    pip install --no-cache-dir -r requirements.audio.txt
+
+# [Same purge, envs, user, CMD]
