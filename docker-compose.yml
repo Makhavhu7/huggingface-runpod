@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  app:
+    image: makhavhu/my-ai-app-image:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all  # Optional, if using GPU later
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
