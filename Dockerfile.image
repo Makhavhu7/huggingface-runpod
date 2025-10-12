@@ -6,11 +6,10 @@ FROM nvidia/cuda:11.8.0-devel-ubuntu18.04
 LABEL org.opencontainers.image.ref.name=ubuntu
 LABEL org.opencontainers.image.version=18.04
 
-# Install min deps (matches your old ADD file)
+# Install min deps
 COPY sources.list /etc/apt/sources.list
-CMD ["/bin/bash"]  # Temporary CMD, will be overridden later
 
-# PyTorch/CUDA args (matches your old)
+# PyTorch/CUDA args
 ARG PYTORCH_VERSION
 ARG TRITON_VERSION
 ARG TARGETPLATFORM
