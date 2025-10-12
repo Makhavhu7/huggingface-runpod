@@ -1,5 +1,5 @@
 fastapi==0.104.1
 uvicorn==0.24.0
-diffusers==0.24.0
+diffusers==0.26.0
 pillow==10.1.0
 safetensors==0.4.0

@@ -1,5 +1,5 @@
 fastapi==0.104.1
 uvicorn==0.24.0
-modelscope==1.10.0
+modelscope==1.11.0
 torchvision==0.15.2+cpu
 opencv-python==4.8.1.78

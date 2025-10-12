@@ -16,13 +16,12 @@ models = {}
 @app.on_event("startup")
 async def load_models():
     try:
-        models["sdxl"] = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", torch_dtype=torch.float16).to(device)
-        models["flux"] = DiffusionPipeline.from_pretrained("black-forest-labs/FLUX.1-dev", torch_dtype=torch.float16).to(device)
+        models["sd3.5"] = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-3.5-large", torch_dtype=torch.float16).to(device)
     except Exception as e:
         print(f"Model load error: {e}")
 
 class GenerateRequest(BaseModel):
-    model: str  # "sdxl" or "flux"
+    model: str  # "sd3.5"
     prompt: str
     num_inference_steps: int = 20
     width: int = 1024

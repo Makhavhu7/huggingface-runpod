@@ -17,7 +17,7 @@ pipe = None
 async def load_model():
     global pipe
     try:
-        pipe = pipeline(Tasks.text_to_video, model="Wan-AI/Wan2.1-T2V-14B", model_revision="v1.1.1")
+        pipe = pipeline(Tasks.text_to_video, model="Wan-AI/Wan2.2-TI2V-5B", model_revision="v1.2.0") # Adjust revision as needed
     except Exception as e:
         print(f"Model load error: {e}")
 
