@@ -1,16 +1,13 @@
-# Base: Lightweight for testing; can switch to nvidia/cuda:11.8.0-runtime-ubuntu18.04 for GPU later
-FROM ubuntu:18.04
+# Base: Upgrade to Ubuntu 20.04 for better Python support
+FROM ubuntu:20.04
 
 # Install min deps
 COPY sources.list /etc/apt/sources.list
 
-# PyTorch/CUDA args (commented for CPU test; uncomment for GPU)
-# ARG CUDA_VERSION=11.8.0
-# LABEL com.nvidia.volumes.needed="nvidia_driver"
-
 # Install Python and deps
 RUN apt-get update && apt-get install -y python3-pip git libsndfile1 ffmpeg wget && \
-    python3 -m pip install --no-cache-dir torch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 --index-url https://download.pytorch.org/whl/cpu
+    python3 -m pip install --upgrade pip && \
+    python3 -m pip install --no-cache-dir torch==2.0.1+cpu torchvision==0.15.2+cpu torchaudio==2.0.2+cpu --index-url https://download.pytorch.org/whl/cpu
 
 # Workdir
 WORKDIR /app
