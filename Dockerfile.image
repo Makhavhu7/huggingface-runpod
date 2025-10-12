@@ -7,8 +7,8 @@ LABEL org.opencontainers.image.ref.name=ubuntu
 LABEL org.opencontainers.image.version=18.04
 
 # Install min deps (matches your old ADD file)
-ADD file:/etc/apt/sources.list /etc/apt/sources.list
-CMD ["/bin/bash"]
+COPY sources.list /etc/apt/sources.list
+CMD ["/bin/bash"]  # Temporary CMD, will be overridden later
 
 # PyTorch/CUDA args (matches your old)
 ARG PYTORCH_VERSION
@@ -18,7 +18,7 @@ ARG CUDA_VERSION=11.8.0
 
 LABEL com.nvidia.volumes.needed="nvidia_driver"
 
-# Install PyTorch (matches your RUN |4 layer: ~39MB)
+# Install PyTorch and Conda
 RUN apt-get update && apt-get install -y wget && \
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
     bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda && \
@@ -27,14 +27,11 @@ RUN apt-get update && apt-get install -y wget && \
     PYTORCH_VERSION=v2.0.0 TRITON_VERSION= TARGETPLATFORM=linux/amd64 \
     /opt/conda/bin/conda install pytorch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 pytorch-cuda=11.8 -c pytorch -c nvidia -y
 
-# Copy Conda (placeholder for your 2.88GB layer; in practice, it's from above)
-COPY /opt/conda /opt/conda
-
-# Post-PyTorch RUN layers (32B + 565B: symlink/fix libs)
+# Post-PyTorch RUN layers (symlink/fix libs)
 RUN PYTORCH_VERSION=v2.0.0 TRITON_VERSION= TARGETPLATFORM=linux/amd64 ln -s /usr/local/cuda-11.8 /usr/local/cuda
 RUN PYTORCH_VERSION=v2.0.0 TRITON_VERSION= TARGETPLATFORM=linux/amd64 ldconfig /usr/local/cuda/lib64
 
-# Envs (matches your old)
+# Envs
 ENV PATH=/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
@@ -44,27 +41,27 @@ ENV PYTORCH_VERSION=v2.0.0
 WORKDIR /workspace
 WORKDIR /app
 
-# Copy app files (matches your old: requirements, app/, main.py)
+# Copy app files
 COPY requirements.image.txt .
 COPY app/ app/
 COPY main.image.py main.py
 
-# Apt update + pip install (matches your old: 147MB + 26MB)
+# Apt update + pip install
 RUN apt-get update && apt-get install -y git libsndfile1 ffmpeg && \
     pip install --no-cache-dir -r requirements.image.txt
 
-# Purge cache (matches your old: 124KB)
+# Purge cache
 RUN apt-get purge -y wget && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
-# Runtime envs (matches your old)
+# Runtime envs
 ENV PYTHONUNBUFFERED=1 \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
     HUGGINGFACE_HUB_CACHE=/dev/shm/hf_cache \
     TRANSFORMERS_CACHE=/dev/shm/transformers_cache
 
-# Create non-root user (matches your old)
+# Create non-root user
 RUN useradd -m appuser
 USER appuser
 
-# CMD (matches your old)
+# Final CMD to run the app
 CMD ["python", "-u", "main.py"]
