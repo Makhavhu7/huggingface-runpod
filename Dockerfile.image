@@ -1,15 +1,19 @@
 # Base: Upgrade to Ubuntu 20.04 for better Python support
 FROM ubuntu:20.04
 
-# Install min deps
+# Install min deps with non-interactive tzdata config
 COPY sources.list /etc/apt/sources.list
 
-# Install Python and deps
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y python3-pip git libsndfile1 ffmpeg wget && \
-    python3 -m pip install --upgrade pip && \
+RUN echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections && \
+    echo 'tzdata tzdata/Zones/Etc select UTC' | debconf-set-selections && \
+    DEBIAN_FRONTEND=noninteractive apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip git libsndfile1 ffmpeg wget
+
+# Upgrade pip and install PyTorch
+RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install --no-cache-dir torch==2.0.1+cpu torchvision==0.15.2+cpu torchaudio==2.0.2+cpu --index-url https://download.pytorch.org/whl/cpu
 
-    # Workdir
+# Workdir
 WORKDIR /app
 
 # Copy app files
