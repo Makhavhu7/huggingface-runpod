@@ -5,7 +5,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all  # Optional, if using GPU later
+      - NVIDIA_VISIBLE_DEVICES=all  # Optional, enable if using GPU later
     deploy:
       resources:
         reservations:
