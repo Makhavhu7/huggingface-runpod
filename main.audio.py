@@ -8,7 +8,6 @@ import base64
 
 app = FastAPI()
 
-# Preload on startup
 preload_models()
 
 class GenerateRequest(BaseModel):
@@ -18,7 +17,6 @@ class GenerateRequest(BaseModel):
 async def generate_audio(req: GenerateRequest):
     try:
         audio_array = generate_audio(req.text)
-        # Encode to base64 (WAV)
         buffer = io.BytesIO()
         write_wav(buffer, SAMPLE_RATE, audio_array)
         audio_b64 = base64.b64encode(buffer.getvalue()).decode()

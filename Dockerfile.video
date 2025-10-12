@@ -1,58 +1,26 @@
-# Same base as above
-ARG RELEASE
-ARG LAUNCHPAD_BUILD_ARCH
-FROM nvidia/cuda:11.8.0-devel-ubuntu18.04
+# Base: Lightweight for testing
+FROM ubuntu:18.04
 
-LABEL org.opencontainers.image.ref.name=ubuntu
-LABEL org.opencontainers.image.version=18.04
+COPY sources.list /etc/apt/sources.list
 
-ADD file:/etc/apt/sources.list /etc/apt/sources.list
-CMD ["/bin/bash"]
+RUN apt-get update && apt-get install -y python3-pip git libsndfile1 ffmpeg wget && \
+    python3 -m pip install --no-cache-dir torch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 --index-url https://download.pytorch.org/whl/cpu
 
-ARG PYTORCH_VERSION
-ARG TRITON_VERSION
-ARG TARGETPLATFORM
-ARG CUDA_VERSION=11.8.0
-
-LABEL com.nvidia.volumes.needed="nvidia_driver"
-
-RUN apt-get update && apt-get install -y wget && \
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-    bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda && \
-    rm Miniconda3-latest-Linux-x86_64.sh && \
-    apt-get clean && \
-    PYTORCH_VERSION=v2.0.0 TRITON_VERSION= TARGETPLATFORM=linux/amd64 \
-    /opt/conda/bin/conda install pytorch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 pytorch-cuda=11.8 -c pytorch -c nvidia -y
-
-COPY /opt/conda /opt/conda
-
-RUN PYTORCH_VERSION=v2.0.0 TRITON_VERSION= TARGETPLATFORM=linux/amd64 ln -s /usr/local/cuda-11.8 /usr/local/cuda
-RUN PYTORCH_VERSION=v2.0.0 TRITON_VERSION= TARGETPLATFORM=linux/amd64 ldconfig /usr/local/cuda/lib64
-
-ENV PATH=/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ENV NVIDIA_VISIBLE_DEVICES=all
-ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
-ENV LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64
-ENV PYTORCH_VERSION=v2.0.0
-
-WORKDIR /workspace
 WORKDIR /app
 
 COPY requirements.video.txt .
 COPY app/ app/
 COPY main.video.py main.py
 
-RUN apt-get update && apt-get install -y git libsndfile1 ffmpeg && \
-    pip install --no-cache-dir -r requirements.video.txt
+RUN python3 -m pip install --no-cache-dir -r requirements.video.txt
 
 RUN apt-get purge -y wget && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONUNBUFFERED=1 \
-    CUDA_DEVICE_ORDER=PCI_BUS_ID \
     HUGGINGFACE_HUB_CACHE=/dev/shm/hf_cache \
     TRANSFORMERS_CACHE=/dev/shm/transformers_cache
 
 RUN useradd -m appuser
 USER appuser
 
-CMD ["python", "-u", "main.py"]
+CMD ["python3", "-u", "main.py"]

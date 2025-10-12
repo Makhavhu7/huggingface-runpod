@@ -1,12 +1,39 @@
+# Base: Lightweight for testing; can switch to nvidia/cuda:11.8.0-runtime-ubuntu18.04 for GPU later
 FROM ubuntu:18.04
 
+# Install min deps
 COPY sources.list /etc/apt/sources.list
-COPY main.image.py main.py
+
+# PyTorch/CUDA args (commented for CPU test; uncomment for GPU)
+# ARG CUDA_VERSION=11.8.0
+# LABEL com.nvidia.volumes.needed="nvidia_driver"
+
+# Install Python and deps
+RUN apt-get update && apt-get install -y python3-pip git libsndfile1 ffmpeg wget && \
+    python3 -m pip install --no-cache-dir torch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 --index-url https://download.pytorch.org/whl/cpu
+
+# Workdir
+WORKDIR /app
+
+# Copy app files
 COPY requirements.image.txt .
+COPY app/ app/
+COPY main.image.py main.py
 
-RUN apt-get update && apt-get install -y python3-pip git && \
-    pip install --no-cache-dir -r requirements.image.txt
+# Install requirements
+RUN python3 -m pip install --no-cache-dir -r requirements.image.txt
 
-ENV PYTHONUNBUFFERED=1
+# Purge cache
+RUN apt-get purge -y wget && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
+# Runtime envs
+ENV PYTHONUNBUFFERED=1 \
+    HUGGINGFACE_HUB_CACHE=/dev/shm/hf_cache \
+    TRANSFORMERS_CACHE=/dev/shm/transformers_cache
+
+# Create non-root user
+RUN useradd -m appuser
+USER appuser
+
+# Final CMD
 CMD ["python3", "-u", "main.py"]

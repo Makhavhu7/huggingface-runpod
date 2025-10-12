@@ -10,8 +10,7 @@ import base64
 
 app = FastAPI()
 
-# Load model on startup
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cpu" # Change to "cuda" for GPU
 pipe = None
 
 @app.on_event("startup")
@@ -31,13 +30,11 @@ async def generate_video(req: GenerateRequest):
     if pipe is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
     try:
-        # Generate video (simplified; adjust for full output)
         output = pipe({"text": req.prompt, "num_inference_steps": req.num_inference_steps})
-        # Assume output is video frames; encode first frame as base64 for demo (full video needs file serve)
-        frame = output["videos"][0][0]  # Placeholder
+        frame = output["videos"][0][0]  # Placeholder for first frame
         ret, buffer = cv2.imencode('.png', frame)
         img_str = base64.b64encode(buffer).decode()
-        return {"video_frame_b64": img_str}  # Extend for full MP4
+        return {"video_frame_b64": img_str}  # Extend for full video
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -1,12 +1,26 @@
-FROM python:3.10-slim
+# Base: Lightweight for testing
+FROM ubuntu:18.04
 
-# [Same as Dockerfile.image until WORKDIR /app]
+COPY sources.list /etc/apt/sources.list
+
+RUN apt-get update && apt-get install -y python3-pip git libsndfile1 ffmpeg wget && \
+    python3 -m pip install --no-cache-dir torch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 --index-url https://download.pytorch.org/whl/cpu
+
+WORKDIR /app
 
 COPY requirements.audio.txt .
 COPY app/ app/
 COPY main.audio.py main.py
 
-RUN apt-get update && apt-get install -y git libsndfile1 ffmpeg && \
-    pip install --no-cache-dir -r requirements.audio.txt
+RUN python3 -m pip install --no-cache-dir -r requirements.audio.txt
 
-# [Same purge, envs, user, CMD]
+RUN apt-get purge -y wget && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHONUNBUFFERED=1 \
+    HUGGINGFACE_HUB_CACHE=/dev/shm/hf_cache \
+    TRANSFORMERS_CACHE=/dev/shm/transformers_cache
+
+RUN useradd -m appuser
+USER appuser
+
+CMD ["python3", "-u", "main.py"]

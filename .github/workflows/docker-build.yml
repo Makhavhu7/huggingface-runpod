@@ -12,6 +12,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify files
+        run: |
+          ls -la
+          [ -f sources.list ] || { echo "sources.list missing"; exit 1; }
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 

@@ -9,8 +9,8 @@ import base64
 
 app = FastAPI()
 
-# Load models on startup (use /dev/shm cache)
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# Load models on startup
+device = "cpu" # Change to "cuda" when using GPU base
 models = {}
 
 @app.on_event("startup")
@@ -34,7 +34,6 @@ async def generate_image(req: GenerateRequest):
         raise HTTPException(status_code=400, detail="Invalid model")
     pipe = models[req.model]
     image = pipe(req.prompt, num_inference_steps=req.num_inference_steps, width=req.width, height=req.height).images[0]
-    # Encode to base64 for API response
     buffered = io.BytesIO()
     image.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue()).decode()
