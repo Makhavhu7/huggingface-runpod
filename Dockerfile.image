@@ -5,11 +5,11 @@ FROM ubuntu:20.04
 COPY sources.list /etc/apt/sources.list
 
 # Install Python and deps
-RUN apt-get update && apt-get install -y python3-pip git libsndfile1 ffmpeg wget && \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y python3-pip git libsndfile1 ffmpeg wget && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install --no-cache-dir torch==2.0.1+cpu torchvision==0.15.2+cpu torchaudio==2.0.2+cpu --index-url https://download.pytorch.org/whl/cpu
 
-# Workdir
+    # Workdir
 WORKDIR /app
 
 # Copy app files
