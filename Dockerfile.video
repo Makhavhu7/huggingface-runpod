@@ -14,8 +14,8 @@ RUN python3 -m pip install --no-cache-dir -r requirements.video.txt
 COPY app/ app/
 COPY main.video.py main.py
 
-# ✅ 20GB DISK FIX
-RUN fallocate -l 20G /app/model_cache/dummy || dd if=/dev/zero of=/app/model_cache/dummy bs=1M count=20480
+# ✅ FIXED: 20GB DISK + CREATE FOLDER FIRST
+RUN mkdir -p /app/model_cache && fallocate -l 20G /app/model_cache/dummy || dd if=/dev/zero of=/app/model_cache/dummy bs=1M count=20480
 
 RUN apt-get purge -y wget curl && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
