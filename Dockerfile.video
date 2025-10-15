@@ -19,9 +19,11 @@ RUN python3 -m pip install --no-cache-dir -r requirements.video.txt
 COPY app/ app/
 COPY main.video.py main.py
 
+# ✅ FIX: Create cache folder + permissions BEFORE user switch
+RUN mkdir -p /app/model_cache && chmod 777 /app/model_cache
+
 RUN apt-get purge -y wget curl && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
-# FIXED CACHE: Persistent disk
 ENV PYTHONUNBUFFERED=1 \
     HUGGINGFACE_HUB_CACHE=/app/model_cache \
     TRANSFORMERS_CACHE=/app/model_cache \
