@@ -15,7 +15,7 @@ pipe = None
 @app.on_event("startup")
 async def load_model():
     global pipe
-    max_retries = 3
+    max_retries = 5  # More retries
     for attempt in range(max_retries):
         try:
             print(f"🚀 Loading model attempt {attempt + 1}/{max_retries}")
@@ -30,9 +30,10 @@ async def load_model():
         except Exception as e:
             print(f"❌ Attempt {attempt + 1} failed: {e}")
             if attempt < max_retries - 1:
-                time.sleep(5)  # Wait 5s before retry
+                print(f"⏳ Waiting 10s before retry...")
+                time.sleep(10)  # Longer wait
             else:
-                print("💥 All retries failed")
+                print("💥 All retries failed - check network")
 
 class GenerateRequest(BaseModel):
     prompt: str

@@ -8,25 +8,20 @@ RUN echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections && \
     DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip git libsndfile1 ffmpeg wget curl
 
-# Install PyTorch CPU first
 RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install --no-cache-dir torch==2.0.1+cpu torchvision==0.15.2+cpu torchaudio==2.0.2+cpu --index-url https://download.pytorch.org/whl/cpu
 
 WORKDIR /app
 
-# Copy requirements & install
 COPY requirements.video.txt .
 RUN python3 -m pip install --no-cache-dir -r requirements.video.txt
 
 COPY app/ app/
 COPY main.video.py main.py
 
-# Pre-download model to fix cache issue
-RUN python3 -c "from modelscope.hub.snapshot_download import snapshot_download; snapshot_download('Wan-AI/Wan2.2-TI2V-5B', revision='bf16', cache_dir='/app/model_cache')"
-
 RUN apt-get purge -y wget curl && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
-# FIXED CACHE: Persistent disk, not RAM
+# FIXED CACHE: Persistent disk
 ENV PYTHONUNBUFFERED=1 \
     HUGGINGFACE_HUB_CACHE=/app/model_cache \
     TRANSFORMERS_CACHE=/app/model_cache \
