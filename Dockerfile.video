@@ -1,8 +1,5 @@
-# Base: Ubuntu 20.04 for stability
 FROM ubuntu:20.04
-
 COPY sources.list /etc/apt/sources.list
-
 RUN echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections && \
     echo 'tzdata tzdata/Zones/Etc select UTC' | debconf-set-selections && \
     DEBIAN_FRONTEND=noninteractive apt-get update && \
@@ -12,15 +9,13 @@ RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install --no-cache-dir torch==2.0.1+cpu torchvision==0.15.2+cpu torchaudio==2.0.2+cpu --index-url https://download.pytorch.org/whl/cpu
 
 WORKDIR /app
-
 COPY requirements.video.txt .
 RUN python3 -m pip install --no-cache-dir -r requirements.video.txt
-
 COPY app/ app/
 COPY main.video.py main.py
 
-# ✅ FIX: Create cache folder + permissions BEFORE user switch
-RUN mkdir -p /app/model_cache && chmod 777 /app/model_cache
+# ✅ 20GB DISK FIX
+RUN fallocate -l 20G /app/model_cache/dummy || dd if=/dev/zero of=/app/model_cache/dummy bs=1M count=20480
 
 RUN apt-get purge -y wget curl && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
@@ -31,5 +26,4 @@ ENV PYTHONUNBUFFERED=1 \
 
 RUN useradd -m appuser
 USER appuser
-
 CMD ["python3", "-u", "main.py"]
