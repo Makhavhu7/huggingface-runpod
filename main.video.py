@@ -16,7 +16,7 @@ pipe = None
 async def load_model():
     global pipe
     try:
-        pipe = pipeline("text-to-video-synthesis", model="Wan-AI/Wan2.2-TI2V-5B", model_revision="v1.2.0")
+        pipe = pipeline("text-to-video-synthesis", model="Wan-AI/Wan2.2-TI2V-5B", model_revision="bf16")
         print("✅ Model loaded successfully!")
     except Exception as e:
         print(f"❌ Model load error: {e}")
