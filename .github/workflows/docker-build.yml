@@ -33,7 +33,7 @@ jobs:
           file: Dockerfile.image
           platforms: linux/amd64
           push: true
-          tags: makhavhu/my-ai-app-image:latest
+          tags: dorfnew/my-ai-app-image:latest
 
       - name: Build and push Video Docker
         uses: docker/build-push-action@v6
@@ -42,7 +42,7 @@ jobs:
           file: Dockerfile.video
           platforms: linux/amd64
           push: true
-          tags: makhavhu/my-ai-app-video:latest
+          tags: dorfnew/my-ai-app-video:latest
 
       - name: Build and push Audio Docker
         uses: docker/build-push-action@v6
@@ -51,4 +51,4 @@ jobs:
           file: Dockerfile.audio
           platforms: linux/amd64
           push: true
-          tags: makhavhu/my-ai-app-audio:latest
+          tags: dorfnew/my-ai-app-audio:latest
