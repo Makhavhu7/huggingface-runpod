@@ -1,7 +1,7 @@
 # Base: Upgrade to Ubuntu 20.04 for better Python support
 FROM ubuntu:20.04
 
-# Install min deps with non-interactive tzdata config
+# Install min deps with non-interactive tzdata configs
 COPY sources.list /etc/apt/sources.list
 
 RUN echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections && \
